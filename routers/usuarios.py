@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 from database import get_db
 from models.mysql_models import Usuario, Notificacion
@@ -24,7 +25,13 @@ async def update_me(
     for field, value in data.model_dump(exclude_none=True).items():
         setattr(usuario, field, value)
     await db.flush()
-    await db.refresh(usuario, ["rol"])
+
+    result = await db.execute(
+        select(Usuario)
+        .options(selectinload(Usuario.rol))
+        .where(Usuario.id_usuario == usuario.id_usuario)
+    )
+    usuario = result.scalar_one()
     return UsuarioOut.model_validate(usuario)
 
 

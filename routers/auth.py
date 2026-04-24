@@ -51,7 +51,14 @@ async def registro(data: UsuarioCreate, db: AsyncSession = Depends(get_db)):
     )
     db.add(usuario)
     await db.flush()
-    await db.refresh(usuario, ["rol"])
+
+    # Recargar el usuario completo con todos sus campos y relaciones
+    result = await db.execute(
+        select(Usuario)
+        .options(selectinload(Usuario.rol))
+        .where(Usuario.id_usuario == usuario.id_usuario)
+    )
+    usuario = result.scalar_one()
 
     access_token = create_access_token(usuario.id_usuario, usuario.rol.nombre)
     refresh_token, jti = create_refresh_token(usuario.id_usuario)
@@ -62,7 +69,6 @@ async def registro(data: UsuarioCreate, db: AsyncSession = Depends(get_db)):
         refresh_token=refresh_token,
         usuario=UsuarioOut.model_validate(usuario),
     )
-
 
 @router.post("/refresh")
 async def refresh_token(data: RefreshRequest, db: AsyncSession = Depends(get_db)):
