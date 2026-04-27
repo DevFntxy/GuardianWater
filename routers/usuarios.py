@@ -62,4 +62,4 @@ async def marcar_leidas(
     )
     for n in result.scalars().all():
         n.leida = True
-    return {"message": "Notificaciones marcadas como leídas"}
+    return {"message": "Notificaciones marcadas como leídas"}   
