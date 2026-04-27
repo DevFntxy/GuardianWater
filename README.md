@@ -5,7 +5,6 @@
 </p>
 
 <img src="images/logo.jpeg" width="100px">
-## LOGOTIPOS
 
 
 ### DESCRIPCION
